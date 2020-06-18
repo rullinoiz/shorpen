@@ -50,11 +50,11 @@ ${YELLOW}CREDITS:${NC}
 "
 
 
-#if [ ! -d "/var/mobile/" ]
-#then
-#  printf "${RED}error${NC}: please run this on your iOS device and not a computer\n"
-#  exit 0
-#fi
+if [ ! -d "/var/mobile/" ]
+then
+  printf "${RED}error${NC}: please run this on your iOS device and not a computer\n"
+  exit 0
+fi
 
 #arguments
 #https://stackoverflow.com/questions/192249/how-do-i-parse-command-line-arguments-in-bash
