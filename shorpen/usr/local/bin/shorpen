@@ -1,0 +1,126 @@
+#!/bin/bash
+
+#colors
+RED="\033[0;31m"
+BLUE="\033[0;34m"
+YELLOW="\033[0;33m"
+PURPLE="\033[0;35m"
+GREEN="\033[0;32m"
+NC="\033[0m"
+
+
+#HELPGUIDE
+HELPGUIDE="${PURPLE}     _                            \n ___| |_  ___  _ _  ___  ___ ._ _ \n<_-<| . |/ . \\| '_>| . \\/ ._>| ' |\n/__/|_|_|\\___/|_|  |  _/\\___.|_|_|\n  ${BLUE}version 1.0.0${PURPLE}    |_|            \n
+${YELLOW}Usage:
+
+    ${BLUE}shorpen ${NC}[-in,--input,-s,--shortcut,-h,--help,-help] [stuff]
+
+${YELLOW}ARGUMENTS:
+  -in,--input${NC}
+    The input to pass to the specified shortcut.
+    Example:
+      ${BLUE}shorpen ${YELLOW}-in ${GREEN}\"Hello World!\" ${NC}--shortcut ${GREEN}\"My shortcut\"
+
+  ${YELLOW}-s,--shortcut${NC}
+    The shortcut to run.
+    Example:
+      ${BLUE}shorpen ${YELLOW}--shortcut ${GREEN}\"My shortcut\"
+
+  ${YELLOW}-h,--help,-help${NC}
+    Print out the help menu (this lol).
+    Example:
+      ${BLUE}shorpen ${YELLOW}--help
+
+IMPORTANT!!${NC}
+  Keep your strings ${GREEN}\"quoted!!\"${NC}
+  Meaning,
+  This is wrong:
+    ${BLUE}shorpen ${NC}--shortcut ${RED}My shortcut${NC}
+
+  This is correct:
+    ${BLUE}shorpen ${NC}--shortcut ${GREEN}\"My shortcut\"${NC}
+
+  If you do not quote your strings, this program ${RED}will have a breakdown and will throw up all over the new IKEA rug. Don't do that!
+
+${YELLOW}CREDITS:${NC}
+  - Argument parsing code: https://stackoverflow.com/questions/192249/how-do-i-parse-command-line-arguments-in-bash
+  - Url encoding: https://stackoverflow.com/questions/296536/how-to-urlencode-data-for-curl-command
+  - rullinoiz for making this lol
+  - you for running it
+"
+
+
+#if [ ! -d "/var/mobile/" ]
+#then
+#  printf "${RED}error${NC}: please run this on your iOS device and not a computer\n"
+#  exit 0
+#fi
+
+#arguments
+#https://stackoverflow.com/questions/192249/how-do-i-parse-command-line-arguments-in-bash
+POSITIONAL=()
+while [[ $# -gt 0 ]]
+do
+  key="$1"
+  case $key in
+    -h|--help|-help)
+      printf "$HELPGUIDE"
+      exit
+    ;;
+    -in|--input)
+      INPUT="$2"
+      shift # past argument
+      shift # past value
+    ;;
+    -s|--shortcut)
+      SHORTCUT="$2"
+      shift # past argument
+      shift # past value
+    ;;
+    *)    # unknown option
+      printf "${RED}error${NC}: unknown option \"${key}\". did you quote your strings?\n"
+      exit 0
+    ;;
+esac
+done
+set -- "${POSITIONAL[@]}" # restore positional parameters
+
+#https://stackoverflow.com/questions/296536/how-to-urlencode-data-for-curl-command
+rawurlencode() {
+  local string="${1}"
+  local strlen=${#string}
+  local encoded=""
+  local pos c o
+
+  for (( pos=0 ; pos<strlen ; pos++ )); do
+     c=${string:$pos:1}
+     case "$c" in
+        [-_.~a-zA-Z0-9] ) o="${c}" ;;
+        * )               printf -v o '%%%02x' "'$c"
+     esac
+     encoded+="${o}"
+  done
+  echo "${encoded}"    # You can either set a return variable (FASTER)
+}
+
+if [ -z "$SHORTCUT" ]
+then
+  printf "${RED}error${NC}: shortcut not specified!! please refer to '${BLUE}shorpen ${NC}--help'\n"
+  exit 0
+fi
+
+if [ ! -z "$INPUT" ]
+then
+  URL="shortcuts://run-shortcut?name=$(rawurlencode $SHORTCUT)&input=$(rawurlencode $INPUT)"
+else
+  URL="shortcuts://run-shortcut?name=$(rawurlencode $SHORTCUT)"
+fi
+
+if uiopen "$URL"
+then
+  sleep 1
+  printf "${GREEN}success!${NC}\n"
+else
+  printf "${RED}something went wrong :flushed:${NC}"
+  exit 0
+fi

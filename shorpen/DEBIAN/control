@@ -1,0 +1,10 @@
+Package: com.rullinoiz.shorpen
+Depends: uiopen
+Name: shorpen
+Version: 1.0.0
+Architecture: iphoneos-arm
+Description: Open shortcuts through the terminal
+Maintainer: rullinoiz
+Author: rullinoiz
+Section: Utilities
+Depiction: https://repoiz.github.io/repoiz/depictions/?p=com.rullinoiz.shorpen
